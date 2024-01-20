@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clientes</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css" />
+</head>
+<body>
+    <!-- Menú de Ionic -->
+    <ion-menu side="start" content-id="main-content">
+        <ion-header>
+            <ion-toolbar color="primary">
+                <ion-title>Menú</ion-title>
+            </ion-toolbar>
+        </ion-header>
+        <ion-content>
+            <ion-list>
+                <ion-item href="/enlace1">
+                    <ion-icon name="paper-plane-outline" slot="start"></ion-icon>
+                    <ion-label>Enlace 1</ion-label>
+                </ion-item>
+                <ion-item href="/enlace2">
+                    <ion-icon name="heart-outline" slot="start"></ion-icon>
+                    <ion-label>Enlace 2</ion-label>
+                </ion-item>
+                <ion-item href="/enlace3">
+                    <ion-icon name="archive-outline" slot="start"></ion-icon>
+                    <ion-label>Enlace 3</ion-label>
+                </ion-item>
+            </ion-list>
+        </ion-content>
+    </ion-menu>
+    <!-- Contenido principal -->
+    <div class="ion-page" id="main-content">
+        <ion-header>
+            <ion-toolbar color="primary">
+                <ion-buttons slot="start">
+                    <ion-menu-button></ion-menu-button>
+                </ion-buttons>
+                <ion-title>Clientes</ion-title>
+            </ion-toolbar>
+        </ion-header>
+        <ion-content class="ion-padding">
+            {% block content %}
+            {% endblock %}
+        </ion-content>
+    </div>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
+<script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"></script>
+</body>
+</html>
