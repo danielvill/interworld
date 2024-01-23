@@ -1,0 +1,34 @@
+{
+    "admin": {
+        "user": "admin",
+        "contraseña": "admin",
+        "correo": "martines@gmail.com"
+    },
+    "cliente": {
+        "user": "marti123",
+        "contraseña": "cliente",
+        "correo": "jhon@gmail.com"
+    },
+    "recuperacion": {
+        "user": "marti123",
+        "correo": "jhon@gmail.com"
+    },
+    "agendar": {
+        "codigo": 123,
+        "nombre": "Maria",
+        "hora": "08:00",
+        "fecha": "2020-01-01",
+        "telefono": "0985764123",
+        "direccion": "la crucitas",
+        "canton": "machala",
+        "estado": "cambio de clave"
+    },
+    "reporte": {
+        "cliente": "Maria",
+        "fecha": "2020-01-01",
+        "direccion": "la crucitas",
+        "canton": "machala",
+        "comentario": "fibra optica",
+        "estado": "completado"
+    }
+}
