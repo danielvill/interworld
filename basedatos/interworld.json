@@ -15,7 +15,7 @@
     },
     "agendar": {
         "codigo": 123,
-        "nombre": "Maria",
+        "cliente": "Maria",
         "hora": "08:00",
         "fecha": "2020-01-01",
         "telefono": "0985764123",
@@ -24,6 +24,7 @@
         "estado": "cambio de clave"
     },
     "reporte": {
+        "codigo":123,
         "cliente": "Maria",
         "fecha": "2020-01-01",
         "direccion": "la crucitas",
