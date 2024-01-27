@@ -1,5 +1,35 @@
 {% extends "tecnicos/layout.html" %}
 {% block content %}
-
-
+<div class="container">
+    <table id="example" class="display" style="width:100%">
+        <thead>
+            <tr>
+                <th>Codigo</th>
+                <th>Cliente</th>
+                <th>Fecha</th>
+                <th>Direccion</th>
+                <th>Canton</th>
+                <th>Comentario</th>
+                <th>Estado</th>
+                
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Tiger Nixon</td>
+                <td>System Architect</td>
+                <td>Edinburgh</td>
+                <td>61</td>
+                <td>Tiger Nixon</td>
+                <td>System Architect</td>
+                <td>Edinburgh</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<script>
+    $(document).ready(function () {
+        $('#example').DataTable();
+    });
+</script>
 {% endblock %}

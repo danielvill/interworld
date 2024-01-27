@@ -123,10 +123,10 @@ def agtecnico():
 
 
 #*Vista de los tecnicos para editarlos
-@app.route('/tecnicos/vitecni')
+@app.route('/tecnicos/vistecni')
 def vitecni():
     tecnicos =db["admin"].find()
-    return render_template('tecnicos/vitecni.html',admin=tecnicos)
+    return render_template('tecnicos/vistecni.html',admin=tecnicos)
 
 
 #*Edicion de los tecnicos
@@ -140,14 +140,14 @@ def edit_tec(tecnico):
         tecnicos.update_one({'user':tecnico},{'set':{'user':user,'contraseña':contraseña,"correo":correo}})
         return redirect(url_for('vitecni'))
     else:
-        return render_template('tecnicos/vitecni.html')
+        return render_template('tecnicos/vistecni.html')
 
 #* Eliminar Tecnicos
 @app.route('/delete_tec/<string:tecnico>')
 def delete_tec(tecnico):
     tecnicos =db["admin"]
     tecnicos.delete_one({'user':tecnico})
-    return redirect(url_for('vitecni'))
+    return redirect(url_for('vistecni'))
 
 
 #* lLenar los datos para enviar a vistacompleta osea reporte
@@ -188,7 +188,7 @@ def vistacompleta():
 
 #* ------------- Modulo Cliente -----------------------------------
 
-@app.route('/clientes/agenda', methods=['POST'])
+@app.route('/clientes/agenda', methods=['GET', 'POST'])
 def agenda():
     if request.method == 'POST':
         agenda =db["agendar"]
