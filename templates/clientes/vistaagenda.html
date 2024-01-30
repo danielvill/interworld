@@ -10,11 +10,13 @@
             </tr>
         </thead>
         <tbody>
+            {% for vistaagenda in agendar %}
             <tr>
-                <td>123456</td>
-                <td>Martinez Perez</td>
-                <td>12/12/2020</td>
+                <td>{{ vistaagenda.codigo }}</td>
+                <td>{{ vistaagenda.cliente }}</td>
+                <td>{{ vistaagenda.fecha}}</td>
             </tr>
+            {% endfor %}
         </tbody>
     </table>
 </div>

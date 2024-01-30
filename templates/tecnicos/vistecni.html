@@ -1,29 +1,54 @@
 {% extends "tecnicos/layout.html" %}
 {% block content %}
 <div class="container">
+    <input type="text" id="searchInput" placeholder="Buscar..." class="form-control mb-3">
     <table id="example" class="display" style="width:100%">
         <thead>
             <tr>
                 <th>Usuario</th>
                 <th>Contraseña</th>
                 <th>Correo</th>
+                <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td>Tiger Nixon</td>
-                <td>System Architect</td>
-                <td>Edinburgh</td>
-            </tr>
+            {% for vitecni in admin %}
+            <form action="/edit_tec/{{ vitecni.user }}" method="post">
+                <tr>
+                    <td><input type="text" value="{{ vitecni.user }}" name="user"></td>
+                    <td><input type="text" value="{{ vitecni.contraseña }}" name="contraseña"></td>
+                    <td><input type="text" value="{{ vitecni.correo }}" name="correo"></td>
+                    <td>
+                        <button type="submit" class="editar btn btn-primary">Editar</button>
+                        <a href="{{url_for('delete_tec',tecnico = vitecni.user)}}" class="eliminar btn btn-danger">Eliminar</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </form>
         </tbody>
     </table>
 </div>
 <script>
     $(document).ready(function () {
-        $('#example').DataTable({
-            info: false,
-            ordering: false,
-            paging: false
+        $("#searchInput").on("keyup", function () {
+            var value = $(this).val().toLowerCase();
+            $("#example tbody tr").filter(function () {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+    });
+    //  Este es oara preguntar de la edicion y eliminacion
+    $(document).ready(function () {
+        $(".editar").click(function (event) {
+            if (!confirm("¿Estás seguro de que quieres editar?")) {
+                event.preventDefault();
+            }
+        });
+
+        $(".eliminar").click(function (event) {
+            if (!confirm("¿Estás seguro de que quieres eliminar?")) {
+                event.preventDefault();
+            }
         });
     });
 </script>

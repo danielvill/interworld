@@ -1,34 +1,52 @@
 {% extends "clientes/layout.html" %}
 {% block content %}
 <div class="container">
-    <form action="" method="post">
+    <form action="/clientes/agenda" method="post">
         <ion-list>
             <ion-item>
-                <ion-input label="Codigo"></ion-input>
+                <ion-input label="Codigo" name="codigo"></ion-input>
             </ion-item>
             <ion-item>
-                <ion-input label="Nombre"></ion-input>
+                <ion-input label="Nombre" name="cliente"></ion-input>
             </ion-item>
             <ion-item>
-                <ion-input label="Hora" type="time"></ion-input>
+                <ion-input label="Hora" type="time" name="hora"></ion-input>
             </ion-item>
             <ion-item>
-                <ion-input label="Fecha" type="date"></ion-input>
+                <ion-input label="Fecha" type="date" name="fecha"></ion-input>
             </ion-item>
             <ion-item>
-                <ion-input label="Telefono"></ion-input>
+                <ion-input label="Telefono" name="telefono"></ion-input>
             </ion-item>
             <ion-item>
-                <ion-input label="Direccion"></ion-input>
+                <ion-input label="Direccion" name="direccion"></ion-input>
             </ion-item>
             <ion-item>
-                <ion-input label="Canton"></ion-input>
+                <ion-input label="Canton" name="canton"></ion-input>
             </ion-item>
             <ion-item>
-                <ion-input label="Estado"></ion-input>
+                <ion-input label="Estado" name="estado"></ion-input>
             </ion-item>
             <ion-button type="submit">Enviar</ion-button>
         </ion-list>
     </form>
 </div>
+<script>
+    // Validación de campos vacíos
+    document.querySelector('form').onsubmit = function (e) {
+        var inputs = this.querySelectorAll('input');
+        for (var i = 0; i < inputs.length; i++) {
+            if (inputs[i].value === '') {
+                e.preventDefault();
+                alert('Llene todos los campos');
+                return;
+            }
+            else {
+                alert('Guardado exitosamente');
+                return;
+            }
+
+        }
+    }
+</script>
 {% endblock %}

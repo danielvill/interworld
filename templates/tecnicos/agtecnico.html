@@ -10,17 +10,18 @@
             <form action="/tecnicos/agtecnico" method="post">
                 <ion-list>
                     <ion-item>
-                    <ion-input label="Ingresar Usuario" name="user"></ion-input>
-                    <ion-input label="Ingresar Contraseña" type="password" name="contraseña"></ion-input>
-                    <ion-input label="Ingresar Correo" type="email" name="correo"></ion-input>
-                </ion-item>
+
+                        <ion-input label="Ingresar Usuario" name="user"></ion-input>
+                        <ion-input label="Ingresar Contraseña" type="password" name="contraseña"></ion-input>
+                        <ion-input label="Ingresar Correo" type="email" name="correo"></ion-input>
+
+                    </ion-item>
                 </ion-list>
                 <button type="submit" class="btn btn-primary">Enviar</button>
             </form>
         </ion-card-content>
     </ion-card>
 </div>
-
 <script>
     // Validación de campos vacíos
     document.querySelector('form').onsubmit = function (e) {
@@ -39,5 +40,4 @@
         }
     }
 </script>
-
 {% endblock %}

@@ -4,19 +4,33 @@
     <table id="example" class="display" style="width:100%">
         <thead>
             <tr>
-                <th>Usuario</th>
-                <th>Contraseña</th>
-                <th>Correo</th>
+                <th>Codigo</th>
+                <th>Cliente</th>
+                <th>Hora</th>
+                <th>Fecha</th>
+                <th>Telefono</th>
+                <th>Direccion</th>
+                <th>Canton</th>
+                <th>Estado</th>
                 <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
+            {% for vistagenda in agendar %}
             <tr>
-                <td>Tiger Nixon</td>
-                <td>System Architect</td>
-                <td>Edinburgh</td>
-                <td>61</td>
+                <td>{{ vistagenda.codigo }}</td>
+                <td>{{ vistagenda.cliente }}</td>
+                <td>{{ vistagenda.hora}}</td>
+                <td>{{ vistagenda.fecha}}</td>
+                <td>{{ vistagenda.telefono}}</td>
+                <td>{{ vistagenda.direccion}}</td>
+                <td>{{ vistagenda.canton}}</td>
+                <td>{{ vistagenda.estado}}</td>
+                <td>
+                    <button type="submit" class="btn btn-primary">Enviar</button>
+                </td>
             </tr>
+            {% endfor %}
         </tbody>
     </table>
 </div>
