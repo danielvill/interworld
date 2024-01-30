@@ -11,11 +11,13 @@
             </tr>
         </thead>
         <tbody>
+            {% for cliente in cliente %}
             <tr>
-                <td>Tiger Nixon</td>
-                <td>System Architect</td>
-                <td>Edinburgh</td>
+                <td>{{ cliente.user }}</td>
+                <td>{{ cliente.contraseña }}</td>
+                <td>{{ cliente.correo }}</td>
                 <td>61</td>
+            {% endfor %}
             </tr>
         </tbody>
     </table>
