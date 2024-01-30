@@ -114,8 +114,8 @@ def agtecnico():
         contraseña = request.form['contraseña']
         correo = request.form['correo']
         if user and contraseña and correo:
-            tecnicos= Admin(user, contraseña, correo)
-            tecnicos.insert_one(tecnicos.AdminDBCollection())
+            tecnico= Admin(user, contraseña, correo)
+            tecnicos.insert_one(tecnico.AdminDBCollection())
             return redirect(url_for('agtecnico'))
     else:
         return render_template('tecnicos/agtecnico.html')
