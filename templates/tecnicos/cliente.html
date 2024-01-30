@@ -10,16 +10,19 @@
                 <th>Acciones</th>
             </tr>
         </thead>
-        <tbody>
-            {% for cliente in cliente %}
-            <tr>
-                <td>{{ cliente.user }}</td>
-                <td>{{ cliente.contraseña }}</td>
-                <td>{{ cliente.correo }}</td>
-                <td>61</td>
-            {% endfor %}
-            </tr>
-        </tbody>
+        <form action="/edit_cli/{{ cliente.user }}" method="post">
+            <tbody>
+                {% for cliente in cliente %}
+                <tr>
+                    <td>{{ cliente.user }}</td>
+                    <td>{{ cliente.contraseña }}</td>
+                    <td>{{ cliente.correo }}</td>
+                    <td><button type="submit" class="btn btn-primary">Enviar</button>
+                    <a href="{{url_for('elitcl',client_nombre=cliente.user)}}" class="btn btn-danger">Eliminar</a></td>
+                    {% endfor %}
+                </tr>
+            </tbody>
+        </form>
     </table>
 </div>
 <script>
