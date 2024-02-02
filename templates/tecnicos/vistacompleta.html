@@ -15,21 +15,28 @@
             </tr>
         </thead>
         <tbody>
+            {% for vistacompleta in reporte %}
             <tr>
-                <td>Tiger Nixon</td>
-                <td>System Architect</td>
-                <td>Edinburgh</td>
-                <td>61</td>
-                <td>Tiger Nixon</td>
-                <td>System Architect</td>
-                <td>Edinburgh</td>
+                <td>{{ vistacompleta.codigo }}</td>
+                <td>{{ vistacompleta.cliente }}</td>
+                <td>{{ vistacompleta.fecha }}</td>
+                <td>{{ vistacompleta.direccion }}</td>
+                <td>{{ vistacompleta.canton }}</td>
+                <td>{{ vistacompleta.comentario }}</td>
+                <td>{{ vistacompleta.estado }}</td>
             </tr>
+            {% endfor %}
         </tbody>
     </table>
 </div>
 <script>
+    //Cambio de english a spanish
     $(document).ready(function () {
-        $('#example').DataTable();
+        $('#example').DataTable({
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Spanish.json"
+            }
+        });
     });
 </script>
 {% endblock %}

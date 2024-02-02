@@ -1,7 +1,7 @@
 {% extends "tecnicos/layout.html" %}
 {% block content %}
 <div class="container">
-    <input type="text" id="searchInput" placeholder="Buscar..." class="form-control mb-3">
+    <input type="text" id="filtro" placeholder="Buscar..." class="form-control mb-3">
     <table id="example" class="display" style="width:100%">
         <thead>
             <tr>
@@ -9,34 +9,38 @@
                 <th>Contraseña</th>
                 <th>Correo</th>
                 <th>Acciones</th>
-            </tr> 
+            </tr>
         </thead>
-        {% for cliente in cliente %}
-        <form action="/edit_cli/{{cliente.user}}" method="POST">
-            <tbody>
-                <tr>
-                    <td><input type="text" value="{{cliente.user}}" name="user"></td>
-                    <td><input type="text" value="{{ cliente.contraseña }}"name="contraseña" > </td>
-                    <td><input type="text" value="{{ cliente.correo }}" name="correo"> </td>
+        <tbody>
+            {% for cliente in cliente %}
+            <form action="/edit_cli/{{cliente.user}}" method="POST">
+                <tr data-user="{{ cliente.user }}">
+                    <td><input type="text" class="form-control" value="{{cliente.user}}" name="user"></td>
+                    <td><input type="text" class="form-control" value="{{ cliente.contraseña }}" name="contraseña">
+                    </td>
+                    <td><input type="text" class="form-control" value="{{ cliente.correo }}" name="correo"> </td>
                     <td>
                         <button type="submit" class="editar btn btn-primary">Editar</button>
-                        <a href="{{url_for('elitcl',client_nombre=cliente.user)}}" class="eliminar btn btn-danger">Eliminar</a>
+                        <a href="{{url_for('elitcl',client_nombre=cliente.user)}}"
+                            class="eliminar btn btn-danger">Eliminar</a>
                     </td>
                 </tr>
-            </tbody>
-        </form>
-        {% endfor %}
+            </form>
+            {% endfor %}
+        </tbody>
     </table>
 </div>
 <script>
     $(document).ready(function () {
-        $("#searchInput").on("keyup", function() {
+        $("#filtro").on("keyup", function () {
             var value = $(this).val().toLowerCase();
-            $("#example tbody tr").filter(function() {
-                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            $("tr[data-user]").filter(function () {
+                $(this).toggle($(this).data("user").toLowerCase().indexOf(value) > -1)
             });
         });
     });
+
+    
     //  Este es oara preguntar de la edicion y eliminacion
     $(document).ready(function () {
         $(".editar").click(function (event) {

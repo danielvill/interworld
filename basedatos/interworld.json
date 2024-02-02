@@ -23,13 +23,23 @@
         "canton": "machala",
         "estado": "cambio de clave"
     },
+    "estado":{
+        "codigo":123,
+        "cliente": "Maria",
+        "fecha": "2020-01-01",
+        "direccion": "la crucitas",
+        "canton": "machala",
+        "comentario": "Cambio necesario para servicio de internte",
+        "estado": "Completado"
+
+    },
     "reporte": {
         "codigo":123,
         "cliente": "Maria",
         "fecha": "2020-01-01",
         "direccion": "la crucitas",
         "canton": "machala",
-        "comentario": "fibra optica",
+        "comentario": "Cambio necesario para servicio de internte",
         "estado": "completado"
     }
 }

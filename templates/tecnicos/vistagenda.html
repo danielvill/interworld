@@ -1,42 +1,55 @@
 {% extends "tecnicos/layout.html" %}
 {% block content %}
 <div class="container">
-    <table id="example" class="display" style="width:100%">
-        <thead>
-            <tr>
-                <th>Codigo</th>
-                <th>Cliente</th>
-                <th>Hora</th>
-                <th>Fecha</th>
-                <th>Telefono</th>
-                <th>Direccion</th>
-                <th>Canton</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for vistagenda in agendar %}
-            <tr>
-                <td>{{ vistagenda.codigo }}</td>
-                <td>{{ vistagenda.cliente }}</td>
-                <td>{{ vistagenda.hora}}</td>
-                <td>{{ vistagenda.fecha}}</td>
-                <td>{{ vistagenda.telefono}}</td>
-                <td>{{ vistagenda.direccion}}</td>
-                <td>{{ vistagenda.canton}}</td>
-                <td>{{ vistagenda.estado}}</td>
-                <td>
-                    <button type="submit" class="btn btn-primary">Enviar</button>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    {% for vistagenda in agendar %}
+    <form action="/tecnicos/vistagenda" method="post">
+        <ion-card>
+            <ion-card-header>
+                <ion-card-title>Agenda de clientes</ion-card-title>
+                <ion-card-subtitle>Revisar antes de enviar </ion-card-subtitle>
+                </ion-card-header>
+                <ion-card-content>
+                    <ion-list>
+                        <ion-item>
+                            <ion-input label="Codigo" label-placement="stacked" readonly name="codigo" value="{{ vistagenda.codigo }}"></ion-input>
+                        </ion-item>
+                        <ion-item>
+                            <ion-input label="Cliente" label-placement="stacked" readonly name="cliente" value="{{ vistagenda.cliente }}"></ion-input>
+                        </ion-item>
+                        <ion-item>
+                            <ion-input label="Hora" label-placement="stacked" readonly value="{{ vistagenda.hora }}"></ion-input>
+                        </ion-item>
+                        <ion-item>
+                            <ion-input label="Fecha" label-placement="stacked" readonly name="fecha" value="{{ vistagenda.fecha }}">
+                        </ion-item>
+                        <ion-item>
+                            <ion-input label="Telefono" label-placement="stacked" readonly value="{{ vistagenda.telefono }}">
+                        </ion-item>
+                        <ion-item>
+                            <ion-input label="Direccion" label-placement="stacked" name="direccion" value="{{ vistagenda.direccion }}">
+                        </ion-item>
+                        <ion-item>
+                            <ion-input label="Canton" label-placement="stacked" name="canton" value="{{ vistagenda.canton }}">
+                        </ion-item>
+                        <ion-item>
+                            <ion-input label="Estado" label-placement="stacked" value="{{ vistagenda.estado }}">
+                        </ion-item>
+                    </ion-list>
+                    <button type="submit" class="enviar btn btn-primary">Enviar</button>
+                </ion-card-content>
+        </ion-card>
+    </form>
+    {% endfor %}
 </div>
 <script>
+
     $(document).ready(function () {
-        $('#example').DataTable();
+        $(".enviar").click(function (event) {
+            if (!confirm("¿Estás seguro de enviar?")) {
+                event.preventDefault();
+            }
+        });
     });
+
 </script>
 {% endblock %}
