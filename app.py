@@ -6,16 +6,28 @@ from modules.cliente import Cliente
 from modules.recuperacion import Recuperacion
 from modules.reporte import Reporte
 from modules.estado import Estado
+from flask_mail import Mail, Message #todo : Intalar pip install flask-mail
 #! Tener Better comments para ver las mejoras en los comentarios
 
 db = dbase()
-
 app = Flask(__name__)
 app.secret_key = 'interworld'
 
-#* ------------- Modulo De Ingreso registro y recuperacion -----------------------------------
 
-#*
+#*Esta parte del codigo lo que hace es que se pone un correo principal el cual recibe todo y este se encarga de enviar a los demas tenicos
+app.config['MAIL_SERVER'] = 'smtp.office365.com'  # Servidor SMTP de Outlook
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USERNAME'] = 'ejemplo@hotmail.com'  # Tu correo de Outlook
+app.config['MAIL_PASSWORD'] = '123' # La contraseña de tu correo de Outlook
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
+mail = Mail(app)
+#* Esta parte termina el codigo de lo que es el correo
+
+
+
+
+#* ------------- Modulo De Ingreso registro y recuperacion -----------------------------------
 @app.route('/',methods=['GET','POST'])
 def principal():
     return render_template('index.html')
@@ -210,7 +222,6 @@ def vistacompleta():
 
 
 #* ------------- Modulo Cliente -----------------------------------
-
 @app.route('/clientes/agenda', methods=['GET', 'POST'])
 def agenda():
     if request.method == 'POST':
@@ -226,11 +237,27 @@ def agenda():
         if codigo and cliente and hora  and fecha and telefono and direccion and canton and  estado:
             agend= Agendar(codigo,cliente, hora,fecha, telefono,direccion, canton,  estado)
             agenda.insert_one(agend.AgeDBCollection())
+            
+            # Obtén la colección 'admin'
+            admin = db["admin"]
+
+            # Busca todos los documentos en la colección 'admin'
+            docs = admin.find({})
+
+            for doc in docs:
+                # Comprueba si el documento tiene un campo 'correo'
+                if 'correo' in doc:
+                    tecnico_email = doc['correo']
+
+                    # Envía la notificación por correo electrónico
+                    msg = Message('Nueva Agenda Registrada', sender='ejemplo@hotmail.com', recipients=[tecnico_email])
+                    msg.body = f'Se ha registrado una nueva agenda con el código {codigo} para el cliente {cliente}.'
+                    mail.send(msg)
+
             return redirect(url_for('agenda'))
     else:
         return render_template('clientes/agenda.html')
-
-        
+    
 @app.route('/clientes/vistaagenda')
 def vistaagenda():
     agenda = db["agendar"].find().sort("fecha", -1).limit(5)#*Muestra los registros de forma descendente y solo muestra 5 registros
