@@ -1,4 +1,4 @@
-from flask import flash, Flask, render_template, request,Response ,jsonify, redirect, url_for
+from flask import flash, Flask,session, render_template, request,Response ,jsonify, redirect, url_for
 from controllers.database import Conexion as dbase
 from modules.admin import Admin
 from modules.agendar import Agendar
@@ -6,6 +6,7 @@ from modules.cliente import Cliente
 from modules.recuperacion import Recuperacion
 from modules.reporte import Reporte
 from modules.estado import Estado
+from datetime import datetime,timedelta
 from flask_mail import Mail, Message #todo : Intalar pip install flask-mail
 #! Tener Better comments para ver las mejoras en los comentarios
 
@@ -18,7 +19,7 @@ app.secret_key = 'interworld'
 app.config['MAIL_SERVER'] = 'smtp.office365.com'  # Servidor SMTP de Outlook
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USERNAME'] = 'ejemplo@hotmail.com'  # Tu correo de Outlook
-app.config['MAIL_PASSWORD'] = '123' # La contraseña de tu correo de Outlook
+app.config['MAIL_PASSWORD'] = 'dcholmes10' # La contraseña de tu correo de Outlook
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 mail = Mail(app)
@@ -28,6 +29,7 @@ mail = Mail(app)
 
 
 #* ------------- Modulo De Ingreso registro y recuperacion -----------------------------------
+
 @app.route('/',methods=['GET','POST'])
 def principal():
     return render_template('index.html')
@@ -40,16 +42,14 @@ def index():
         user_admin = db.admin.find_one({"user":username, "contraseña":contraseña})
         user_cliente = db.cliente.find_one({"user":username,"contraseña":contraseña})
         if user_admin:
+            session['user'] = username
             return redirect(url_for('cliente'))
         elif user_cliente:
-            print("no hay nada")
-            return redirect(url_for('agenda')) #TODO: No te olvides de agregar que solo tiene 5 oportunidades de agregar usuario o contraseña sino se bloquea la pagina
-            
+            session['user'] = username
+            return redirect(url_for('agenda',user=username)) #TODO: No te olvides de agregar que solo tiene 5 oportunidades de agregar usuario o contraseña sino se bloquea la pagina
         else:
             flash("Usuario o contraseña incorrectos")
-            print("ya me fui")
-            return redirect(url_for('index'))
-        
+            return redirect(url_for('index'))        
     else:
         return render_template('index.html')    
 
@@ -61,11 +61,25 @@ def login():
         user = request.form['user']
         contraseña = request.form['contraseña'] 
         correo = request.form['correo']
-# todo: Manda un mensaje que se guardo el cliente con exito con javascripts
+
         if user and contraseña and correo:
-            registra= Cliente(user, contraseña, correo)
-            registrar.insert_one(registra.ClienDBCollection())
-            return redirect(url_for('index'))
+
+            # Verificar si el usuario ya existe
+            if registrar.find_one({"user": user}):
+                # Si el usuario ya existe, mostrar un mensaje de error
+                flash("El usuario ya existen")
+                return redirect(url_for('login'))
+            
+            # Verificar si el correo ya existe
+            elif registrar.find_one({"correo": correo}):
+                # Si el correo ya existe, mostrar un mensaje de error
+                flash("El correo ya existen")
+                return redirect(url_for('login'))
+            else:
+                # Si el usuario no existe, proceder con el registro
+                registra= Cliente(user, contraseña, correo)
+                registrar.insert_one(registra.ClienDBCollection())
+                return redirect(url_for('index'))
     else:
         return render_template('login.html')    
 
@@ -78,9 +92,15 @@ def recuperacion():
         user = request.form['user']
         correo =request.form['correo']
         if user and correo:  # todo: No te olvides de enviar un mensaje de que sepa la persona que va a recibir un correo para la recuperacion 
-            recu= Recuperacion(user, correo)
-            recu.insert_one(recu.RecuDBCollection())
-            return redirect(url_for('index'))
+            #Verificar si el usuario o correo ya se registraron
+            if recu.find_one({'user':user}):
+                flash("El usuario ya se registro")
+                return redirect(url_for('recuperacion'))
+            else:
+                recupe= Recuperacion(user, correo)
+                recu.insert_one(recupe.RecuDBCollection())
+                flash("Gracias por enviar tus datos muy pronto recibiras un mensaje a tu correo para que puedas ingresar de nuevo con tus credenciales actualizadas ")
+                return redirect(url_for('index'))
     else:
         return render_template('recuperacion.html')    
 
@@ -122,6 +142,7 @@ def vistagenda():
     return render_template('tecnicos/vistagenda.html',agendar=agenda)
     
 
+
 #* Enviar de agenda a estado
 @app.route('/tecnicos/vistagenda', methods=['GET','POST'])
 def envitagenda():
@@ -140,7 +161,6 @@ def envitagenda():
         return render_template('tecnicos/vistagenda.html')
 
 
-
 #*Agregar Tecnico
 @app.route('/tecnicos/agtecnico', methods=['GET','POST'])
 def agtecnico():
@@ -155,7 +175,6 @@ def agtecnico():
             return redirect(url_for('agtecnico'))
     else:
         return render_template('tecnicos/agtecnico.html')
-
 
 
 #*Vista de los tecnicos para editarlos
@@ -222,42 +241,65 @@ def vistacompleta():
 
 
 #* ------------- Modulo Cliente -----------------------------------
+
+
+
 @app.route('/clientes/agenda', methods=['GET', 'POST'])
-def agenda():
-    if request.method == 'POST':
-        agenda =db["agendar"]
-        codigo=request.form["codigo"]
-        cliente=request.form["cliente"]
-        hora=request.form["hora"]
-        fecha=request.form["fecha"]
-        telefono=request.form["telefono"]
-        direccion=request.form["direccion"]
-        canton=request.form["canton"]
-        estado=request.form["estado"]
-        if codigo and cliente and hora  and fecha and telefono and direccion and canton and  estado:
-            agend= Agendar(codigo,cliente, hora,fecha, telefono,direccion, canton,  estado)
-            agenda.insert_one(agend.AgeDBCollection())
-            
-            # Obtén la colección 'admin'
-            admin = db["admin"]
-
-            # Busca todos los documentos en la colección 'admin'
-            docs = admin.find({})
-
-            for doc in docs:
-                # Comprueba si el documento tiene un campo 'correo'
-                if 'correo' in doc:
-                    tecnico_email = doc['correo']
-
-                    # Envía la notificación por correo electrónico
-                    msg = Message('Nueva Agenda Registrada', sender='ejemplo@hotmail.com', recipients=[tecnico_email])
-                    msg.body = f'Se ha registrado una nueva agenda con el código {codigo} para el cliente {cliente}.'
-                    mail.send(msg)
-
-            return redirect(url_for('agenda'))
+def agenda():     
+    if 'user' in session:
+        if request.method == 'POST':
+            agenda =db["agendar"]
+            codigo=request.form["codigo"]
+            cliente=request.form["cliente"]
+            hora=request.form["hora"]
+            fecha=request.form["fecha"]
+            telefono=request.form["telefono"]
+            direccion=request.form["direccion"]
+            canton=request.form["canton"]
+            estado=request.form["estado"]
+            #if codigo and cliente and hora  and fecha and telefono and direccion and canton and  estado:
+            #    agend= Agendar(codigo,cliente, hora,fecha, telefono,direccion, canton,  estado)
+            #    agenda.insert_one(agend.AgeDBCollection())
+                
+    
+    
+            # Obtiene la fecha y hora actual
+            fecha_actual = datetime.now()
+            fecha_str = fecha_actual.strftime("%Y-%m-%d")  # Convierte la fecha a una cadena de texto
+            # Verifica si el cliente ya tiene dos ingresos en la fecha actual
+            if agenda.count_documents({'cliente': cliente, 'fecha': fecha_str}) < 2:
+                agend = Agendar(codigo, cliente, hora, fecha, telefono, direccion, canton, estado)
+                agenda.insert_one(agend.AgeDBCollection())
+                return redirect(url_for('agenda'))
+                # ...
+                # Resto de tu código para enviar el correo electrónico
+                # Obtén la colección 'admin'
+                #admin = db["admin"]
+    
+                # Busca todos los documentos en la colección 'admin'
+                #docs = admin.find({})
+    
+                #for doc in docs:
+                    # Comprueba si el documento tiene un campo 'correo'
+                #    if 'correo' in doc:
+                #        tecnico_email = doc['correo']
+#    
+                #        # Envía la notificación por correo electrónico
+                #        msg = Message('Nueva Agenda Registrada', sender='ejemplo@hotmail.com', recipients=[tecnico_email])
+                #        msg.body = f'Se ha registrado una nueva agenda con el código {codigo} para el cliente {cliente}.'
+                #        mail.send(msg)
+                
+            else:
+                # Aquí puedes manejar el caso cuando el cliente ya tiene dos ingresos.
+                # Por ejemplo, puedes mostrar un mensaje de error.
+                mensaje ="Ingresastes dos citas este dia regresa mañana para que registres otro dia"
+                flash(mensaje)
+                return  redirect(url_for('agenda'))
+        else:
+            return render_template('clientes/agenda.html',user=session['user'])
     else:
         return render_template('clientes/agenda.html')
-    
+
 @app.route('/clientes/vistaagenda')
 def vistaagenda():
     agenda = db["agendar"].find().sort("fecha", -1).limit(5)#*Muestra los registros de forma descendente y solo muestra 5 registros

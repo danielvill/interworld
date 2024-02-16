@@ -12,18 +12,19 @@
         </thead>
         <tbody>
             {% for vitecni in admin %}
-            <tr>
-                <form action="/edit_tec/{{ vitecni.user }}" method="post">
-                    <td><input type="text" class=" form-control"  value="{{ vitecni.user }}" name="user"></td>
-                    <td><input type="text" class=" form-control"  value="{{ vitecni.contraseña }}" name="contraseña"></td>
-                    <td><input type="text" class=" form-control"  value="{{ vitecni.correo }}" name="correo"></td>
+            <form action="/edit_tec/{{ vitecni.user }}" method="post">
+                <tr>
+                    <td><input type="text" class=" form-control" value="{{ vitecni.user }}" name="user"></td>
+                    <td><input type="text" class=" form-control" value="{{ vitecni.contraseña }}" name="contraseña">
+                    </td>
+                    <td><input type="text" class=" form-control" value="{{ vitecni.correo }}" name="correo"></td>
                     <td>
                         <button type="submit" class="editar btn btn-primary">Editar</button>
                         <a href="{{url_for('delete_tec',tecnico = vitecni.user)}}"
                             class="eliminar btn btn-danger">Eliminar</a>
                     </td>
-                </form>
-            </tr>
+                </tr>
+            </form>
             {% endfor %}
         </tbody>
     </table>

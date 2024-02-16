@@ -13,21 +13,30 @@
             <div class="col-5">
                 <img src="/static/img/Inter.png" style="display: block; margin: auto; width: 200px; height: 150px;">
                 <h2 class="text-center">Registro de Usuario</h2>
-                <form action="/login" method="post">
+                <form action="/login" method="post" onsubmit="return validarFormulario()">
                     <div class="form-group">
-                        <input type="text" class="form-control"  name="correo" placeholder="correo">
+                        <input type="text" class="form-control" id="correo" name="correo" placeholder="correo">
                     </div>
                     <div class="form-group">
-                        <input type="text" class="form-control"  name="user" placeholder="usuario">
+                        <input type="text" class="form-control" id="user" name="user" placeholder="usuario">
                     </div>
                     <div class="form-group">
-                        <input type="password" class="form-control"  name="contraseña" placeholder="contraseña">
+                        <input type="password" class="form-control" id="contraseña" name="contraseña"
+                            placeholder="contraseña">
                     </div>
-                    <button type="submit" class="btn btn-primary" >Registrarse</button>
+                    {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                    <div class="alert alert-warning">
+                        {{ messages[0] }}
+                    </div>
+                    {% endif %}
+                    {% endwith %}
+                    <button type="submit" class="btn btn-primary">Registrarse</button>
                 </form>
             </div>
         </div>
     </div>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="/static/js/validar/v_login.js"></script>
 </body>
 </html>

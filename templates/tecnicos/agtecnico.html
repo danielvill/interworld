@@ -1,7 +1,7 @@
 {% extends "tecnicos/layout.html" %}
 {% block content %}
 <div class="container">
-    <ion-card >
+    <ion-card>
         <ion-card-header>
             <ion-card-title>Ingreso de Tecnicos</ion-card-title>
             <ion-card-subtitle></ion-card-subtitle>
@@ -9,13 +9,11 @@
         <ion-card-content>
             <form action="/tecnicos/agtecnico" method="post">
                 <ion-list>
-                    <ion-item>
-
-                        <ion-input label="Ingresar Usuario" name="user"></ion-input>
-                        <ion-input label="Ingresar Contraseña" type="password" name="contraseña"></ion-input>
-                        <ion-input label="Ingresar Correo" type="email" name="correo"></ion-input>
-
-                    </ion-item>
+                    <ion-item><ion-input label="Ingresar Usuario" name="user"></ion-input></ion-item>
+                    <ion-item><ion-input label="Ingresar Contraseña" type="password"
+                        name="contraseña"></ion-input></ion-item>
+                    <ion-item><ion-input label="Ingresar Correo" type="email"
+                        name="correo"></ion-input></ion-item>
                 </ion-list>
                 <button type="submit" class="btn btn-primary">Enviar</button>
             </form>
