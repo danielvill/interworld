@@ -294,27 +294,11 @@ def agenda():
             # Obtiene la fecha y hora actual
             fecha_actual = datetime.now()
             fecha_str = fecha_actual.strftime("%Y-%m-%d")  # Convierte la fecha a una cadena de texto
+            
             # Verifica si el cliente ya tiene dos ingresos en la fecha actual
             if agenda.count_documents({'cliente': cliente, 'fecha': fecha_str}) < 2:
                 agend = Agendar(codigo, cliente, hora, fecha, telefono, direccion, canton, estado)
                 agenda.insert_one(agend.AgeDBCollection())
-                return redirect(url_for('agenda'))
-                
-            #Obtén la colección 'admin'
-            admin = db["admin"]
-
-            #Busca todos los documentos en la colección 'admin'
-            docs = admin.find({})
-
-            for doc in docs:
-            # Comprueba si el documento tiene un campo 'correo'
-                if 'correo' in doc:
-                    tecnico_email = doc['correo']
-
-                    # Envía la notificación por correo electrónico
-                    msg = Message('Nueva Agenda Registrada', sender='ejemplo@hotmail.com', recipients=[tecnico_email])
-                    msg.body = f'Se ha registrado una nueva agenda con el código {codigo} para el cliente {cliente}.'
-                    mail.send(msg)
                 
             else:
                 # Aquí puedes manejar el caso cuando el cliente ya tiene dos ingresos.
@@ -322,6 +306,25 @@ def agenda():
                 mensaje ="Ingresastes dos citas este dia regresa mañana para que registres otro dia"
                 flash(mensaje)
                 return  redirect(url_for('agenda'))
+            
+            #Obtén la colección 'admin'
+            admin = db["admin"]
+            
+            #Busca todos los documentos en la colección 'admin'
+            docs = admin.find({})
+            
+            for doc in docs:
+                # Comprueba si el documento tiene un campo 'correo'
+                if 'correo' in doc:
+                    tecnico_email = doc['correo']
+            
+                    # Envía la notificación por correo electrónico
+                    msg = Message('Nueva Agenda Registrada', sender='ejemplo@hotmail.com', recipients=[tecnico_email])
+                    msg.body = f'Se ha registrado una nueva agenda con el código {codigo} para el cliente {cliente}.'
+                    mail.send(msg)
+
+                    # Redirect to the agenda page or render a template with a success message
+                    return redirect(url_for('agenda'))
         else:
             return render_template('clientes/agenda.html',user=session['user'])
     else:
