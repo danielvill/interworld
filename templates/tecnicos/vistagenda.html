@@ -36,13 +36,13 @@
                         </ion-item>
                     </ion-list>
                     <button type="submit" class="enviar btn btn-primary">Enviar</button>
+                    <a href="{{url_for('elitage',age_name = vistagenda.codigo)}}" class="eliminar btn btn-danger">Eliminar</a>
                 </ion-card-content>
         </ion-card>
     </form>
     {% endfor %}
 </div>
 <script>
-
     $(document).ready(function () {
         $(".enviar").click(function (event) {
             if (!confirm("¿Estás seguro de enviar?")) {
@@ -50,6 +50,13 @@
             }
         });
     });
-
+    //  Este es oara preguntar de la edicion y eliminacion
+    $(document).ready(function () {
+        $(".eliminar").click(function (event) {
+            if (!confirm("¿Estás seguro de que quieres eliminar?")) {
+                event.preventDefault();
+            }
+        });
+    });
 </script>
 {% endblock %}

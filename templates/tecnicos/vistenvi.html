@@ -47,13 +47,8 @@
 </form>
 {% endfor %}
 </div>
-<script>
-    $(document).ready(function () {
-        $(".editar").click(function (event) {
-            if (!confirm("¿Estás seguro de enviar?")) {
-                event.preventDefault();
-            }
-        });
-    });
+<script src="/static/js/form.js">
+
+    
 </script>
 {% endblock %}
