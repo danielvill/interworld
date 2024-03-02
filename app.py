@@ -7,7 +7,7 @@ from modules.recuperacion import Recuperacion
 from modules.reporte import Reporte
 from modules.estado import Estado
 from datetime import datetime,timedelta
-from flask_mail import Mail, Message #todo : Intalar pip install flask-mail
+from flask_mail import Mail, Message #todo:Instalar pip install flask-mail
 #! Tener Better comments para ver las mejoras en los comentarios
 
 db = dbase()
@@ -18,8 +18,8 @@ app.secret_key = 'interworld'
 #*Esta parte del codigo lo que hace es que se pone un correo principal el cual recibe todo y este se encarga de enviar a los demas tenicos
 app.config['MAIL_SERVER'] = 'smtp.office365.com'  # Servidor SMTP de Outlook
 app.config['MAIL_PORT'] = 587
-app.config['MAIL_USERNAME'] = 'ejemplo@hotmail.com'  # Tu correo de Outlook
-app.config['MAIL_PASSWORD'] = '123' # La contraseña de tu correo de Outlook
+app.config['MAIL_USERNAME'] = 'danniel_villacres@hotmail.com'  # Tu correo de Outlook
+app.config['MAIL_PASSWORD'] = 'dcholmes10' # La contraseña de tu correo de Outlook
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 mail = Mail(app)
@@ -319,12 +319,13 @@ def agenda():
                     tecnico_email = doc['correo']
             
                     # Envía la notificación por correo electrónico
-                    msg = Message('Nueva Agenda Registrada', sender='ejemplo@hotmail.com', recipients=[tecnico_email])
+                    msg = Message('Nueva Agenda Registrada', sender='danniel_villacres@hotmail.com', recipients=[tecnico_email])
                     msg.body = f'Se ha registrado una nueva agenda con el código {codigo} para el cliente {cliente}.'
                     mail.send(msg)
 
                     # Redirect to the agenda page or render a template with a success message
-                    return redirect(url_for('agenda'))
+                    return redirect(url_for('agenda'))  
+            
         else:
             return render_template('clientes/agenda.html',user=session['user'])
     else:

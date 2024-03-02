@@ -1,7 +1,7 @@
 {% extends "tecnicos/layout.html" %}
 {% block content %}
 <div class="container">
-    <table id="example" class="display" style="width:100%">
+    <table id="myTable" class="table">
         <thead>
             <tr>
                 <th>Usuario</th>
@@ -12,30 +12,82 @@
         </thead>
         <tbody>
             {% for vitecni in admin %}
-            <form action="/edit_tec/{{ vitecni.user }}" method="post">
                 <tr>
-                    <td><input type="text" class=" form-control" value="{{ vitecni.user }}" name="user"></td>
-                    <td><input type="text" class=" form-control" value="{{ vitecni.contraseña }}" name="contraseña">
-                    </td>
-                    <td><input type="text" class=" form-control" value="{{ vitecni.correo }}" name="correo"></td>
+                    <td>{{ vitecni.user }}</td>
+                    <td>{{ vitecni.contraseña }}</td>
+                    <td>{{ vitecni.correo }}</td>
                     <td>
                         <button type="submit" class="editar btn btn-primary">Editar</button>
                         <a href="{{url_for('delete_tec',tecnico = vitecni.user)}}"
                             class="eliminar btn btn-danger">Eliminar</a>
                     </td>
                 </tr>
-            </form>
             {% endfor %}
         </tbody>
     </table>
 </div>
+<div id="editModal" title="Editar Admin">
+    <form id="editForm" action="" method="post">
+        <div class="container">
+            <div class="col">
+                <label for="usuario">Usuario</label>
+                <input type="text" id="usuario" name="user" class="form-control">
+            </div>
+            <div class="col">
+                <label for="">Contraseña</label>
+                <input type="text" id="contraseña" name="contraseña" class="form-control">
+            </div>
+            <div class="col">
+                <label for="">Correo</label>
+                <input type="email" id="correo" name="correo" class="form-control">
+            </div>
+        </div>
+    </form>
+</div>
 <script>
     //  Este es oara preguntar de la edicion y eliminacion
     $(document).ready(function () {
-        $(".editar").click(function (event) {
-            if (!confirm("¿Estás seguro de que quieres editar?")) {
-                event.preventDefault();
+        $('#myTable').DataTable({
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Spanish.json"
             }
+        });
+        var table = $('#myTable').DataTable();
+        //Cambio de english a spanish
+        // Funcionalidad de edición
+        table.on('click', '.editar', function () {
+            var row = $(this).closest('tr');
+            var data = table.row(row).data();
+            // Aquí puedes abrir el modal y llenar los campos del formulario con los datos del usuario
+            // Por ejemplo:
+            $('#usuario').val(data[0]);
+            $('#contraseña').val(data[1]);
+            $('#correo').val(data[2]);
+            $('#editForm').attr('action','/edit_tec/'+ data[0]);
+            $('#editModal').dialog('open');
+        });
+        // Inicializar el modal
+        $('#editModal').dialog({
+            autoOpen: false,
+            modal: true,
+            buttons: [
+                {
+                    text: 'Guardar',
+                    click: function () {
+                        $('#editForm').submit();
+                    },
+                    // Agregar una clase al botón
+                    class: 'guardar'
+                },
+                {
+                    text: 'Cancelar',
+                    click: function () {
+                        $(this).dialog('close');
+                    },
+                    // Agregar una clase al botón
+                    class: 'cancelar'
+                }
+            ]
         });
 
         $(".eliminar").click(function (event) {
