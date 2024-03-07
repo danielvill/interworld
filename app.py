@@ -1,4 +1,5 @@
 from flask import flash, Flask,session, render_template, request,Response ,jsonify, redirect, url_for
+from bson import json_util
 from controllers.database import Conexion as dbase
 from modules.admin import Admin
 from modules.agendar import Agendar
@@ -26,9 +27,22 @@ mail = Mail(app)
 #* Esta parte termina el codigo de lo que es el correo
 
 
-
-
 #* ------------- Modulo De Ingreso registro y recuperacion -----------------------------------
+
+@app.route('/logout')
+def logout():
+    # Elimina el usuario de la sesión si está presente
+    session.pop('username', None)
+    return redirect(url_for('index'))
+
+@app.route('/tecnicos/home',methods=['GET','POST'])
+def home():
+    # Verifica si el usuario está en la sesión
+    if 'username' in session:
+        return render_template('tecnicos/home.html')
+    else:
+        flash("Inicia sesion con tu usuario y contraseña")
+        return redirect(url_for('index'))
 
 @app.route('/',methods=['GET','POST'])
 def principal():
@@ -42,11 +56,12 @@ def index():
         user_admin = db.admin.find_one({"user":username, "contraseña":contraseña})
         user_cliente = db.cliente.find_one({"user":username,"contraseña":contraseña})
         if user_admin:
-            session['user'] = username
-            return redirect(url_for('cliente'))
+            session["username"]= user_admin["user"]
+            return redirect(url_for('home'))
         elif user_cliente:
+            session["username"]= user_cliente["user"]
             session['user'] = username
-            return redirect(url_for('agenda',user=username)) #TODO: No te olvides de agregar que solo tiene 5 oportunidades de agregar usuario o contraseña sino se bloquea la pagina
+            return redirect(url_for('casa',user=username)) #TODO: No te olvides de agregar que solo tiene 5 oportunidades de agregar usuario o contraseña sino se bloquea la pagina
         else:
             flash("Usuario o contraseña incorrectos")
             return redirect(url_for('index'))        
@@ -114,6 +129,10 @@ def recuperacion():
 #*Este es para mostrar a los clientes
 @app.route('/tecnicos/cliente')
 def cliente():
+    # Verifica si el usuario está en la sesión
+    if 'username' not in session:
+        flash("Inicia sesion con tu usuario y contraseña")
+        return redirect(url_for('index'))    
     cliente = db['cliente'].find()
     return render_template('tecnicos/cliente.html',cliente=cliente)    
 
@@ -143,6 +162,10 @@ def elitcl(client_nombre):
 #todo : este apartado tiene que enviar notificaciones a los correos de los tecnicos
 @app.route('/tecnicos/vistagenda')
 def vistagenda():
+    # Verifica si el usuario está en la sesión
+    if 'username' not in session:
+        flash("Inicia sesion con tu usuario y contraseña")
+        return redirect(url_for('index'))
     agenda =db["agendar"].find().sort("fecha",-1).limit(5)
     return render_template('tecnicos/vistagenda.html',agendar=agenda)
 
@@ -151,6 +174,10 @@ def vistagenda():
 #* Enviar de agenda a estado
 @app.route('/tecnicos/vistagenda', methods=['GET','POST'])
 def envitagenda():
+    # Verifica si el usuario está en la sesión
+    if 'username' not in session:
+        flash("Inicia sesion con tu usuario y contraseña")
+        return redirect(url_for('index'))
     if request.method == 'POST':
         envi =db['estado']
         codigo = request.form['codigo']
@@ -177,6 +204,10 @@ def elitage(age_name):
 #*Agregar Tecnico
 @app.route('/tecnicos/agtecnico', methods=['GET','POST'])
 def agtecnico():
+    # Verifica si el usuario está en la sesión
+    if 'username' not in session:
+        flash("Inicia sesion con tu usuario y contraseña")
+        return redirect(url_for('index'))
     if request.method == 'POST':
         tecnicos =db["admin"]
         user = request.form['user']
@@ -193,6 +224,10 @@ def agtecnico():
 #*Vista de los tecnicos para editarlos
 @app.route('/tecnicos/vistecni')
 def vitecni():
+    # Verifica si el usuario está en la sesión
+    if 'username' not in session:
+        flash("Inicia sesion con tu usuario y contraseña")
+        return redirect(url_for('index'))
     tecnicos =db["admin"].find()
     return render_template('tecnicos/vistecni.html',admin=tecnicos)
 
@@ -221,6 +256,10 @@ def delete_tec(tecnico):
 #*Apartado de enviar y eliminar los registros de agendar
 @app.route('/tecnicos/vistenvi', methods=['GET', 'POST'])
 def vistenvi2():
+    # Verifica si el usuario está en la sesión
+    if 'username' not in session:
+        flash("Inicia sesion con tu usuario y contraseña")
+        return redirect(url_for('index'))
     if request.method == 'POST':
         enviar=db["reporte"]
         agendar=db["agendar"]
@@ -247,6 +286,10 @@ def vistenvi2():
 #*Vista de los reportes que tiene es para visualizar todo lo que hay en ella
 @app.route('/tecnicos/vistacompleta')
 def vistacompleta():
+    # Verifica si el usuario está en la sesión
+    if 'username' not in session:
+        flash("Inicia sesion con tu usuario y contraseña")
+        return redirect(url_for('index'))
     reporte=db['reporte'].find()
     return render_template('tecnicos/vistacompleta.html',reporte=reporte)
 
@@ -254,6 +297,11 @@ def vistacompleta():
 #* Tecnico Recuperacion 
 @app.route('/tecnicos/vistarecu')
 def vistarecu():
+    # Verifica si el usuario está en la sesión
+    if 'username' not in session:
+        flash("Inicia sesion con tu usuario y contraseña")
+        return redirect(url_for('index'))
+    
     recuperacion=db['recuperacion'].find()
     return render_template('tecnicos/vistarecu.html',recuperacion=recuperacion)
 
@@ -272,8 +320,22 @@ def delete_rec(recuperacion):
 
 #* ------------- Modulo Cliente -----------------------------------
 
+@app.route('/clientes/home',methods=['GET','POST'])
+def casa():
+    # Verifica si el usuario está en la sesión
+    if 'username' in session:
+        return render_template('clientes/home.html')
+    else:
+        flash("Inicia sesion con tu usuario y contraseña")
+        return redirect(url_for('index'))
+
 @app.route('/clientes/agenda', methods=['GET', 'POST'])
-def agenda():     
+def agenda():
+    # Verifica si el usuario está en la sesión
+    if 'username' not in session:
+        flash("Inicia sesion con tu usuario y contraseña")
+        return redirect(url_for('index'))
+    
     if 'user' in session:
         if request.method == 'POST':
             agenda =db["agendar"]
@@ -333,6 +395,11 @@ def agenda():
 
 @app.route('/clientes/vistaagenda')
 def vistaagenda():
+    # Verifica si el usuario está en la sesión
+    if 'username' not in session:
+        flash("Inicia sesion con tu usuario y contraseña")
+        return redirect(url_for('index'))
+    
     agenda = db["agendar"].find().sort("fecha", -1).limit(5)#*Muestra los registros de forma descendente y solo muestra 5 registros
     return render_template('clientes/vistaagenda.html', agendar=agenda)
 
