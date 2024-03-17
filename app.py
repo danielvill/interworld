@@ -19,8 +19,8 @@ app.secret_key = 'interworld'
 #*Esta parte del codigo lo que hace es que se pone un correo principal el cual recibe todo y este se encarga de enviar a los demas tenicos
 app.config['MAIL_SERVER'] = 'smtp.office365.com'  # Servidor SMTP de Outlook
 app.config['MAIL_PORT'] = 587
-app.config['MAIL_USERNAME'] = 'danniel_villacres@hotmail.com'  # Tu correo de Outlook
-app.config['MAIL_PASSWORD'] = 'dcholmes10' # La contraseña de tu correo de Outlook
+app.config['MAIL_USERNAME'] = 'popeye198733@hotmail.com'  # Tu correo de Outlook
+app.config['MAIL_PASSWORD'] = 'grumete31' # La contraseña de tu correo de Outlook
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 mail = Mail(app)
@@ -208,15 +208,25 @@ def agtecnico():
     if 'username' not in session:
         flash("Inicia sesion con tu usuario y contraseña")
         return redirect(url_for('index'))
+    
     if request.method == 'POST':
         tecnicos =db["admin"]
         user = request.form['user']
         contraseña = request.form['contraseña']
         correo = request.form['correo']
-        if user and contraseña and correo:
+        
+        
+        if user  and correo:
+            existing_tecnico = tecnicos.find_one({"user": user,"correo": correo})
+        
+        if existing_tecnico is None:
             tecnico = Admin(user, contraseña, correo)
             tecnicos.insert_one(tecnico.AdminDBCollection())
             return redirect(url_for('agtecnico'))
+        else:
+            # Si existe, muestra un mensaje de error
+            flash("Ya existe un administrador con esos datos ingresa otros datos nuevos.")
+            return render_template('tecnicos/agtecnico.html')
     else:
         return render_template('tecnicos/agtecnico.html')
 
@@ -381,7 +391,7 @@ def agenda():
                     tecnico_email = doc['correo']
             
                     # Envía la notificación por correo electrónico
-                    msg = Message('Nueva Agenda Registrada', sender='danniel_villacres@hotmail.com', recipients=[tecnico_email])
+                    msg = Message('Nueva Agenda Registrada', sender='popeye198733@hotmail.com', recipients=[tecnico_email])
                     msg.body = f'Se ha registrado una nueva agenda con el código {codigo} para el cliente {cliente}.'
                     mail.send(msg)
 

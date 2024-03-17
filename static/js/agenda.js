@@ -1,23 +1,3 @@
-// Validacion si los campos estan vacios
-document.querySelector('form').onsubmit = function (e) {
-    var inputs = this.querySelectorAll('input');
-    var todosLlenos = true; // Asume que todos los campos están llenos
-
-    for (var i = 0; i < inputs.length; i++) {
-        if (inputs[i].value === '') {
-            todosLlenos = false; // Si un campo está vacío, establece todosLlenos en falso
-            break; // No necesitas verificar el resto de los campos, así que puedes salir del bucle
-        }
-    }
-
-    if (!todosLlenos) {
-        e.preventDefault(); // Previene el envío del formulario
-        alert('Los campos estan vacios');
-    } else {
-        alert('Guardado exitosamente');
-    }
-};
-
 // Ingresado validacion para celular y digitos correctos  
 // Validacion de numero telefonico
 document.querySelector('form').addEventListener('submit', function(event) {
@@ -43,33 +23,43 @@ document.querySelector('form').addEventListener('submit', function(event) {
     }
 
 
+
+// Validacion si los campos estan vacios
+document.querySelector('form').onsubmit = function (e) {
+    var inputs = this.querySelectorAll('input');
+    var todosLlenos = true; // Asume que todos los campos están llenos
+
+    for (var i = 0; i < inputs.length; i++) {
+        if (inputs[i].value === '') {
+            todosLlenos = false; // Si un campo está vacío, establece todosLlenos en falso
+            break; // No necesitas verificar el resto de los campos, así que puedes salir del bucle
+        }
+    }
+
+    if (!todosLlenos) {
+        e.preventDefault(); // Previene el envío del formulario
+        alert('Los campos estan vacios');
+    } else {
+        alert('Guardado exitosamente');
+    }
+};
+
+
+
 // Horas
 // Obtener todos los elementos con la clase 'fecha'
-var elementosFecha = document.getElementsByClassName('fecha');
+document.getElementById('fecha').addEventListener('change', function() {
+    let fecha = new Date();
+    let horas = fecha.getHours();
+    let minutos = fecha.getMinutes();
+    let ampm = horas >= 12 ? 'pm' : 'am';
+    horas = horas % 12;
+    horas = horas ? horas : 12; // la hora '0' debe ser '12'
+    minutos = minutos < 10 ? '0'+minutos : minutos;
+    let strHora = horas + ':' + minutos + ' ' + ampm;
+    document.getElementById('hora').value = strHora;
+});
 
-// Añadir el evento 'change' a cada elemento
-for (var i = 0; i < elementosFecha.length; i++) {
-    elementosFecha[i].addEventListener('change', function() {
-        var fecha = new Date();
-        var hora = fecha.getHours();
-        var minutos = fecha.getMinutes();
-
-        // Horarios laborales
-        var inicioJornada1 = 9;  // 9:00 AM
-        var finJornada1 = 12;    // 12:00 PM
-        var inicioJornada2 = 15; // 3:00 PM
-        var finJornada2 = 18;    // 6:00 PM
-
-        // Verificar si la hora actual está dentro de los horarios laborales
-        if ((hora >= inicioJornada1 && hora < finJornada1) || (hora >= inicioJornada2 && hora < finJornada2)) {
-            // Formatear la hora y los minutos para que siempre tengan dos dígitos
-            var horaFormateada = ("0" + hora).slice(-2) + ":" + ("0" + minutos).slice(-2);
-            document.getElementById('hora').value = horaFormateada;
-        } else {
-            alert("No es un horario laboral. Los horarios laborales son de 09:00 AM a 12:00 PM y de 03:00 PM a 06:00 PM.");
-        }
-    });
-}
 
 
 //    // Ingresado de Horas 
