@@ -7,8 +7,10 @@ from modules.cliente import Cliente
 from modules.recuperacion import Recuperacion
 from modules.reporte import Reporte
 from modules.estado import Estado
+from modules.tecnico import Tecnico
 from datetime import datetime,timedelta
 from flask_mail import Mail, Message #todo:Instalar pip install flask-mail
+from flask import jsonify
 #! Tener Better comments para ver las mejoras en los comentarios
 
 db = dbase()
@@ -19,8 +21,8 @@ app.secret_key = 'interworld'
 #*Esta parte del codigo lo que hace es que se pone un correo principal el cual recibe todo y este se encarga de enviar a los demas tenicos
 app.config['MAIL_SERVER'] = 'smtp.office365.com'  # Servidor SMTP de Outlook
 app.config['MAIL_PORT'] = 587
-app.config['MAIL_USERNAME'] = 'popeye198733@hotmail.com'  # Tu correo de Outlook
-app.config['MAIL_PASSWORD'] = 'grumete31' # La contraseña de tu correo de Outlook
+app.config['MAIL_USERNAME'] = 'danniel_villacres@hotmail.com'  # Tu correo de Outlook
+app.config['MAIL_PASSWORD'] = 'dcholmes10' # La contraseña de tu correo de Outlook
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 mail = Mail(app)
@@ -54,10 +56,14 @@ def index():
         username = request.form['user']
         contraseña = request.form['contraseña']
         user_admin = db.admin.find_one({"user":username, "contraseña":contraseña})
+        user_tecnico = db.tecnico.find_one({"user":username, "contraseña":contraseña})
         user_cliente = db.cliente.find_one({"user":username,"contraseña":contraseña})
         if user_admin:
             session["username"]= user_admin["user"]
             return redirect(url_for('home'))
+        elif user_tecnico:
+            session["username"]= user_tecnico["user"]
+            return redirect(url_for('home3'))
         elif user_cliente:
             session["username"]= user_cliente["user"]
             session['user'] = username
@@ -180,16 +186,17 @@ def envitagenda():
         return redirect(url_for('index'))
     if request.method == 'POST':
         envi =db['estado']
-        codigo = request.form['codigo']
+        tecnico = request.form['tecnico']
         cliente = request.form['cliente']
         fecha = request.form['fecha']
         direccion = request.form['direccion']
         canton = request.form['canton']
-        if codigo and cliente and fecha and direccion and canton :
-            envia= Estado(codigo,cliente,fecha,direccion,canton)
+        if tecnico and cliente and fecha and direccion and canton :
+            envia= Estado(tecnico,cliente,fecha,direccion,canton)
             envi.insert_one(envia.EsDBCollection())
-
-            return redirect(url_for('vistenvi2'))
+            
+            flash("Se envió al técnico correspondiente.")
+            return redirect(url_for('envitagenda'))
     else:
         return render_template('tecnicos/vistagenda.html')
 
@@ -197,7 +204,7 @@ def envitagenda():
 @app.route('/delete_age/<string:age_name>')
 def elitage(age_name):
     agenda =db['agendar']
-    agenda.delete_one({'codigo':age_name})
+    agenda.delete_one({'tecnico':age_name})
     return redirect(url_for('envitagenda'))   
 
 
@@ -210,7 +217,7 @@ def agtecnico():
         return redirect(url_for('index'))
     
     if request.method == 'POST':
-        tecnicos =db["admin"]
+        tecnicos =db["tecnico"]
         user = request.form['user']
         contraseña = request.form['contraseña']
         correo = request.form['correo']
@@ -220,12 +227,12 @@ def agtecnico():
             existing_tecnico = tecnicos.find_one({"user": user,"correo": correo})
         
         if existing_tecnico is None:
-            tecnico = Admin(user, contraseña, correo)
-            tecnicos.insert_one(tecnico.AdminDBCollection())
+            tecnico = Tecnico(user, contraseña, correo)
+            tecnicos.insert_one(tecnico.TecniDBCollection())
             return redirect(url_for('agtecnico'))
         else:
             # Si existe, muestra un mensaje de error
-            flash("Ya existe un administrador con esos datos ingresa otros datos nuevos.")
+            flash("Ya existe un Tecnicos con esos datos ingresa otros datos nuevos.")
             return render_template('tecnicos/agtecnico.html')
     else:
         return render_template('tecnicos/agtecnico.html')
@@ -238,14 +245,14 @@ def vitecni():
     if 'username' not in session:
         flash("Inicia sesion con tu usuario y contraseña")
         return redirect(url_for('index'))
-    tecnicos =db["admin"].find()
-    return render_template('tecnicos/vistecni.html',admin=tecnicos)
+    tecnicos =db["tecnico"].find()
+    return render_template('tecnicos/vistecni.html',tecnico=tecnicos)
 
 
 #*Edicion de los tecnicos
 @app.route('/edit_tec/<string:tecnico>', methods=['GET', 'POST'])
 def edit_tec(tecnico):
-    tecnicos =db["admin"]
+    tecnicos =db["tecnico"]
     user= request.form["user"]
     contraseña = request.form["contraseña"]
     correo= request.form["correo"]
@@ -258,7 +265,7 @@ def edit_tec(tecnico):
 #* Eliminar Tecnicos
 @app.route('/delete_tec/<string:tecnico>')
 def delete_tec(tecnico):
-    tecnicos =db["admin"]
+    tecnicos =db["tecnico"]
     tecnicos.delete_one({'user':tecnico})
     return redirect(url_for('vitecni'))
 
@@ -272,20 +279,18 @@ def vistenvi2():
         return redirect(url_for('index'))
     if request.method == 'POST':
         enviar=db["reporte"]
-        agendar=db["agendar"]
         estador=db["estado"]
-        codigo=request.form["codigo"]
+        tecnico=request.form["tecnico"]
         cliente=request.form["cliente"]
         fecha=request.form["fecha"]
         direccion=request.form["direccion"]
         canton=request.form["canton"]
         comentario=request.form["comentario"]
         estado=request.form["estado"]
-        if codigo and cliente and fecha and direccion and canton and comentario and estado:
-            enviare= Reporte(codigo,cliente, fecha, direccion, canton, comentario, estado)
+        if tecnico and cliente and fecha and direccion and canton and comentario and estado:
+            enviare= Reporte(tecnico,cliente, fecha, direccion, canton, comentario, estado)
             enviar.insert_one(enviare.RepoDBCollection())
             # * Aquí eliminamos el documento de la colección "agendar"
-            agendar.delete_one({'cliente': cliente, 'fecha': fecha, 'direccion': direccion, 'canton': canton})
             estador.delete_one({'cliente': cliente, 'fecha': fecha, 'direccion': direccion, 'canton': canton})
             return redirect(url_for('vistacompleta'))
     else:
@@ -339,6 +344,7 @@ def casa():
         flash("Inicia sesion con tu usuario y contraseña")
         return redirect(url_for('index'))
 
+
 @app.route('/clientes/agenda', methods=['GET', 'POST'])
 def agenda():
     # Verifica si el usuario está en la sesión
@@ -349,7 +355,7 @@ def agenda():
     if 'user' in session:
         if request.method == 'POST':
             agenda =db["agendar"]
-            codigo=request.form["codigo"]
+            tecnico = request.form.get("tecnico", "")
             cliente=request.form["cliente"]
             hora=request.form["hora"]
             fecha=request.form["fecha"]
@@ -357,33 +363,34 @@ def agenda():
             direccion=request.form["direccion"]
             canton=request.form["canton"]
             estado=request.form["estado"]
-            #if codigo and cliente and hora  and fecha and telefono and direccion and canton and  estado:
-            #    agend= Agendar(codigo,cliente, hora,fecha, telefono,direccion, canton,  estado)
-            #    agenda.insert_one(agend.AgeDBCollection())
+            
                 
-    
+            # Verifica si la fecha y hora ya están ocupadas
+            if agenda.count_documents({'fecha': fecha, 'hora': hora}) > 0:
+                flash("La fecha y hora seleccionadas ya están ocupadas. Por favor, elige otra.")
+                return redirect(url_for('agenda'))
     
             # Obtiene la fecha y hora actual
             fecha_actual = datetime.now()
             fecha_str = fecha_actual.strftime("%Y-%m-%d")  # Convierte la fecha a una cadena de texto
             
             # Verifica si el cliente ya tiene dos ingresos en la fecha actual
-            if agenda.count_documents({'cliente': cliente, 'fecha': fecha_str}) < 2:
-                agend = Agendar(codigo, cliente, hora, fecha, telefono, direccion, canton, estado)
+            if agenda.count_documents({'cliente': cliente, 'fecha': fecha_str}) < 1:
+                agend = Agendar(tecnico, cliente, hora, fecha, telefono, direccion, canton, estado)
                 agenda.insert_one(agend.AgeDBCollection())
                 
             else:
                 # Aquí puedes manejar el caso cuando el cliente ya tiene dos ingresos.
                 # Por ejemplo, puedes mostrar un mensaje de error.
-                mensaje ="Ingresastes dos citas este dia regresa mañana para que registres otro dia"
+                mensaje ="Ya ingresastes una cita, espera que los técnicos pronto se comunicaran contigo."
                 flash(mensaje)
                 return  redirect(url_for('agenda'))
             
-            #Obtén la colección 'admin'
-            admin = db["admin"]
+            #Obtén la colección 'tecnico'
+            tecnico = db["tecnico"]
             
-            #Busca todos los documentos en la colección 'admin'
-            docs = admin.find({})
+            #Busca todos los documentos en la colección 'tecnico'
+            docs = tecnico.find({})
             
             for doc in docs:
                 # Comprueba si el documento tiene un campo 'correo'
@@ -391,10 +398,10 @@ def agenda():
                     tecnico_email = doc['correo']
             
                     # Envía la notificación por correo electrónico
-                    msg = Message('Nueva Agenda Registrada', sender='popeye198733@hotmail.com', recipients=[tecnico_email])
-                    msg.body = f'Se ha registrado una nueva agenda con el código {codigo} para el cliente {cliente}.'
+                    msg = Message('Nueva Agenda Registrada', sender='danniel_villacres@hotmail.com', recipients=[tecnico_email])
+                    msg.body = f'Se ha registrado una nueva agenda con los siguientes datos {telefono},{direccion},{canton} para el cliente {cliente}.'
                     mail.send(msg)
-
+                    flash("Su cita se guardo exitosamente")
                     # Redirect to the agenda page or render a template with a success message
                     return redirect(url_for('agenda'))  
             
@@ -403,6 +410,23 @@ def agenda():
     else:
         return render_template('clientes/agenda.html')
 
+
+@app.route('/clientes/disponibilidad', methods=['GET'])
+def disponibilidad():
+    agenda = db["agendar"]
+    
+    # Obtiene la fecha actual
+    fecha_actual = datetime.now()
+    
+    # Convierte la fecha a una cadena de texto en el formato que usas en tu base de datos
+    fecha_str = fecha_actual.strftime("%Y-%m-%d")
+    
+    # Filtra las citas para que solo se muestren las que están programadas para la fecha actual o fechas futuras
+    citas = agenda.find({'fecha': {'$gte': fecha_str}}, {"fecha": 1, "hora": 1})
+    
+    return render_template('clientes/disponibilidad.html', citas=citas)
+
+# Clientes 
 @app.route('/clientes/vistaagenda')
 def vistaagenda():
     # Verifica si el usuario está en la sesión
@@ -412,6 +436,58 @@ def vistaagenda():
     
     agenda = db["agendar"].find().sort("fecha", -1).limit(5)#*Muestra los registros de forma descendente y solo muestra 5 registros
     return render_template('clientes/vistaagenda.html', agendar=agenda)
+
+
+# * Tecni  Vista de los tecnicos para el sistema 
+#*Apartado de enviar y eliminar los registros de agendar
+@app.route('/tecni/vistenvi', methods=['GET', 'POST'])
+def vistencni2():
+    # Verifica si el usuario está en la sesión
+    if 'username' not in session:
+        flash("Inicia sesion con tu usuario y contraseña")
+        return redirect(url_for('index'))
+    if request.method == 'POST':
+        enviar=db["reporte"]
+        agendar=db["agendar"]
+        estador=db["estado"]
+        tecnico=request.form["tecnico"]
+        cliente=request.form["cliente"]
+        fecha=request.form["fecha"]
+        direccion=request.form["direccion"]
+        canton=request.form["canton"]
+        comentario=request.form["comentario"]
+        estado=request.form["estado"]
+        if tecnico and cliente and fecha and direccion and canton and comentario and estado:
+            enviare= Reporte(tecnico,cliente, fecha, direccion, canton, comentario, estado)
+            enviar.insert_one(enviare.RepoDBCollection())
+            # * Aquí eliminamos el documento de la colección "agendar"
+            agendar.delete_one({'cliente': cliente, 'fecha': fecha, 'direccion': direccion, 'canton': canton})
+            estador.delete_one({'cliente': cliente, 'fecha': fecha, 'direccion': direccion, 'canton': canton})
+            return redirect(url_for('vistecnicompleta'))
+    else:
+        estado=db['estado'].find()
+        return render_template('tecni/vistenvi.html',estado=estado)
+
+
+#*Vista de los reportes que tiene es para visualizar todo lo que hay en ella
+@app.route('/tecni/vistacompleta')
+def vistecnicompleta():
+    # Verifica si el usuario está en la sesión
+    if 'username' not in session:
+        flash("Inicia sesion con tu usuario y contraseña")
+        return redirect(url_for('index'))
+    reporte=db['reporte'].find()
+    return render_template('tecni/vistacompleta.html',reporte=reporte)
+
+
+@app.route('/tecni/home',methods=['GET','POST'])
+def home3():
+    # Verifica si el usuario está en la sesión
+    if 'username' in session:
+        return render_template('tecni/home.html')
+    else:
+        flash("Inicia sesion con tu usuario y contraseña")
+        return redirect(url_for('index'))
 
 
 

@@ -1,20 +1,32 @@
 {% extends "clientes/layout.html" %}
 {% block content %}
 <div class="container">
+    <h3>
+        Solo podría agendar una visita diaria, por favor, llene todos los campos.
+    </h3>
     <form action="/clientes/agenda" method="post">
         <ion-list>
-            <ion-item>
-                <ion-input label="Codigo" id="codigo" name="codigo" readonly></ion-input>
-            </ion-item>
+            <ion-input label="Codigo" id="codigo" name="codigo" hidden></ion-input>
             <ion-item>
                 <ion-input label="Nombre de usuario" name="cliente" value="{{ user }}" readonly></ion-input>
             </ion-item>
             <ion-item>
-                <ion-input label="Hora" type="datetime" id="hora" name="hora"
-                    placeholder="Selecciona la fecha este formato se llena automaticamente" readonly></ion-input>
+                <ion-select label="Hora" type="time" id="hora" name="hora" placeholder="Selecciona la hora" required>
+                    <ion-select-option value="09:00">09:00 AM</ion-select-option>
+                    <ion-select-option value="10:00">10:00 AM</ion-select-option>
+                    <ion-select-option value="11:00">11:00 AM</ion-select-option>
+                    <ion-select-option value="12:00">12:00 AM</ion-select-option>
+                    <ion-select-option value="15:00">15:00 PM</ion-select-option>
+                    <ion-select-option value="16:00">16:00 PM</ion-select-option>
+                    <ion-select-option value="17:00">17:00 PM</ion-select-option>
+                </ion-select>
             </ion-item>
             <ion-item>
-                <ion-input label="Fecha" type="date" class="fecha" id="fecha" name="fecha"></ion-input>
+                <ion-input label="Fecha" type="date" class="fecha" id="fecha" name="fecha" required>
+                </ion-input>
+            </ion-item>
+            <ion-item>
+                <a href="{{ url_for('disponibilidad') }}">Ver disponibilidad de fecha y hora para cita</a>
             </ion-item>
             <ion-item>
                 <ion-input id="miInput" oninput="limitarEntrada()" label="Telefono" name="telefono"></ion-input>
@@ -40,6 +52,31 @@
         </ion-list>
     </form>
 </div>
+<script>
+    
+    const hoy = new Date();
+    const anio = hoy.getFullYear();
+    const mes = hoy.getMonth() + 1; // Los meses comienzan en 0
+    const dia = hoy.getDate();
+    // Formatear la fecha actual (opcional)
+    const fechaActual = `${anio}-${mes.toString().padStart(2, "0")}-${dia.toString().padStart(2, "0")}`;
+    const inputFecha = document.getElementById("fecha");
+    function esDomingo(fecha) {
+        const dia = fecha.getDay();
+        return dia === 0; // 0 es domingo
+    }
+    inputFecha.addEventListener("change", function () {
+        const fechaSeleccionada = new Date(this.value);
+        if (fechaSeleccionada < hoy) {
+            this.value = "";
+            alert("No se permiten fechas anteriores a la actual");
+        } else if (esDomingo(fechaSeleccionada)) {
+            this.value = "";
+            alert("No se permiten domingos");
+        }
+    });
+    inputFecha.value = fechaActual;
+</script>
 <script src="/static/js/agenda.js"></script>
 <script src="/static/js/validar/v_fecha.js"></script>
 {% endblock %}

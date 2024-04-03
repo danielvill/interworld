@@ -1,6 +1,6 @@
 class Reporte:
-    def __init__(self,codigo,cliente,fecha,direccion,canton,comentario,estado):
-        self.codigo = codigo
+    def __init__(self,tecnico,cliente,fecha,direccion,canton,comentario,estado):
+        self.tecnico = tecnico
         self.cliente = cliente
         self.fecha = fecha
         self.direccion = direccion
@@ -10,7 +10,7 @@ class Reporte:
         
     def RepoDBCollection(self):
         return{
-            "codigo":self.codigo,
+            "tecnico":self.tecnico,
             "cliente":self.cliente,
             "fecha":self.fecha,
             "direccion":self.direccion,

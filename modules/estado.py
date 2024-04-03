@@ -1,6 +1,6 @@
 class Estado:
-    def __init__(self,codigo,cliente,fecha,direccion,canton):
-        self.codigo = codigo
+    def __init__(self,tecnico,cliente,fecha,direccion,canton):
+        self.tecnico = tecnico
         self.cliente = cliente
         self.fecha = fecha
         self.direccion = direccion
@@ -9,7 +9,7 @@ class Estado:
         
     def EsDBCollection(self):
         return{
-            "codigo":self.codigo,
+            "tecnico":self.tecnico,
             "cliente":self.cliente,
             "fecha":self.fecha,
             "direccion":self.direccion,

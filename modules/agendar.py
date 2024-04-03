@@ -1,6 +1,6 @@
 class Agendar:
-    def __init__(self,codigo,cliente,hora,fecha,telefono,direccion,canton,estado):
-        self.codigo = codigo
+    def __init__(self,tecnico,cliente,hora,fecha,telefono,direccion,canton,estado):
+        self.tecnico = tecnico
         self.cliente = cliente
         self.hora = hora
         self.fecha = fecha
@@ -11,7 +11,7 @@ class Agendar:
         
     def AgeDBCollection(self):
         return{
-            "codigo":self.codigo,
+            "tecnico":self.tecnico,
             "cliente":self.cliente,
             "hora":self.hora,
             "fecha":self.fecha,
