@@ -30,8 +30,8 @@ app.secret_key = 'interworld'
 #*Esta parte del codigo lo que hace es que se pone un correo principal el cual recibe todo y este se encarga de enviar a los demas tenicos
 app.config['MAIL_SERVER'] = 'smtp.office365.com'  # Servidor SMTP de Outlook
 app.config['MAIL_PORT'] = 587
-app.config['MAIL_USERNAME'] = 'danniel_villacres@hotmail.com'  # Tu correo de Outlook
-app.config['MAIL_PASSWORD'] = 'dcholmes10' # La contraseña de tu correo de Outlook
+app.config['MAIL_USERNAME'] = 'popeye198733@hotmail.com'  # Tu correo de Outlook
+app.config['MAIL_PASSWORD'] = 'grumete31' # La contraseña de tu correo de Outlook
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 mail = Mail(app)
