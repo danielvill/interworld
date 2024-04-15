@@ -1,35 +1,33 @@
 {% extends "tecni/layout.html" %}
 {% block content %}
 <div class="container">
-    {% for vistenvi2 in estado %}
     <form action="/tecni/vistenvi" method="post">
-    <ion-card>
-        <ion-card-header>
-            <ion-card-title>Ingreso de estado de los clientes</ion-card-title>
-            <ion-card-subtitle>Revisar antes de enviar</ion-card-subtitle>
-        </ion-card-header>
-        
-        <ion-card-content>   
+        <ion-card>
+            <ion-card-header>
+                <ion-card-title>Ingreso de estado de los clientes</ion-card-title>
+                <ion-card-subtitle>Revisar antes de enviar</ion-card-subtitle>
+            </ion-card-header>
+            <ion-card-content>
                 <ion-list>
                     <ion-item>
-                        <ion-input label="Nombre del tecnico" label-placement="stacked" 
-                            name="tecnico" value="{{ vistenvi2.tecnico }}" readonly></ion-input>
+                        <ion-input label="Nombre del tecnico" label-placement="stacked" name="tecnico"
+                            value="{{ vistenviw2.tecnico }}" readonly></ion-input>
                     </ion-item>
                     <ion-item>
-                        <ion-input label="Cliente" label-placement="stacked"  name="cliente"
-                            value="{{ vistenvi2.cliente }}" readonly></ion-input>
+                        <ion-input label="Cliente" label-placement="stacked" name="cliente"
+                            value="{{ vistenviw2.cliente }}" readonly></ion-input>
                     </ion-item>
                     <ion-item>
-                        <ion-input label="Fecha" name="fecha" label-placement="stacked"
-                            value="{{ vistenvi2.fecha }}" readonly></ion-input>
+                        <ion-input label="Fecha" name="fecha" label-placement="stacked" value="{{ vistenviw2.fecha }}"
+                            readonly></ion-input>
                     </ion-item>
                     <ion-item>
-                        <ion-input label="Direccion" name="direccion" label-placement="stacked" 
-                            value="{{ vistenvi2.direccion }}" readonly></ion-input>
+                        <ion-input label="Direccion" name="direccion" label-placement="stacked"
+                            value="{{ vistenviw2.direccion }}" readonly></ion-input>
                     </ion-item>
                     <ion-item>
-                        <ion-input label="Canton" name="canton" label-placement="stacked" 
-                            value="{{ vistenvi2.canton }}" readonly></ion-input>
+                        <ion-input label="Canton" name="canton" label-placement="stacked" value="{{ vistenviw2.canton }}"
+                            readonly></ion-input>
                     </ion-item>
                     <ion-item>
                         <ion-input label="Comentario" name="comentario" label-placement="stacked"
@@ -41,14 +39,9 @@
                     </ion-item>
                 </ion-list>
                 <ion-button type="submit" class="editar">Enviar a reporte</ion-button>
-           
-        </ion-card-content>
-    </ion-card>
-</form>
-{% endfor %}
+            </ion-card-content>
+        </ion-card>
+    </form>
 </div>
-<script src="/static/js/form.js">
-
-    
-</script>
+<script src="/static/js/form.js"></script>
 {% endblock %}

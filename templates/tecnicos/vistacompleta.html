@@ -1,6 +1,20 @@
 {% extends "tecnicos/layout.html" %}
 {% block content %}
 <div class="container">
+
+    <form action="/admin/reporte/re_vistacompleta" method="get">
+        <br>
+        <label for="nombre" style=" color: white;">
+            <h4>Reporte por tecnicos</h4>
+        </label><br>
+        <input type="text" id="vtecnico" name="tecnico" class="form-control" style="width: 150px;">
+        <br>
+        <input type="submit" value="Filtrar" class="btn btn-primary">
+        <a href="{{ url_for('re_vistacompleta') }}" class="btn btn-primary">
+            
+            Reporte completo</a>
+    </form>
+    <br>
     <table id="example" class="display" style="width:100%">
         <thead>
             <tr>

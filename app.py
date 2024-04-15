@@ -1,4 +1,4 @@
-from flask import flash, Flask,session, render_template, request,Response ,jsonify, redirect, url_for
+from flask import flash, Flask, send_file,session, render_template, request,Response ,jsonify, redirect, url_for
 from bson import json_util
 from controllers.database import Conexion as dbase
 from modules.admin import Admin
@@ -11,6 +11,15 @@ from modules.tecnico import Tecnico
 from datetime import datetime,timedelta
 from flask_mail import Mail, Message #todo:Instalar pip install flask-mail
 from flask import jsonify
+from reportlab.pdfgen import canvas # *pip install reportlab
+from reportlab.lib.pagesizes import letter #* pip install reportlab 
+from reportlab.lib.units import inch
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.platypus import SimpleDocTemplate, Table, Paragraph, TableStyle, Spacer ,Image
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet ,ParagraphStyle
+
 #! Tener Better comments para ver las mejoras en los comentarios
 
 db = dbase()
@@ -63,6 +72,7 @@ def index():
             return redirect(url_for('home'))
         elif user_tecnico:
             session["username"]= user_tecnico["user"]
+            session['user'] = username
             return redirect(url_for('home3'))
         elif user_cliente:
             session["username"]= user_cliente["user"]
@@ -309,6 +319,140 @@ def vistacompleta():
     return render_template('tecnicos/vistacompleta.html',reporte=reporte)
 
 
+# * Para sacar pdf de lo que es vistacompleta
+
+def generar_pdf_vistacompleta(datos):
+    doc = SimpleDocTemplate("reporte.pdf", pagesize=letter)
+    story = []
+
+    # Define un estilo con texto centrado
+    styles = getSampleStyleSheet()
+    left_aligned_style = styles['Heading3']
+    left_aligned_style.alignment = 0  # 0 = TA_LEFT
+
+
+    
+    # Agrega la imagen
+    imagen = Image('static/img/inter.png', width=150, height=100)
+    imagen.hAlign = 'CENTER'
+    story.append(imagen)
+    #story.append(Spacer(1, 12))
+
+    from datetime import datetime
+    fecha_hora = datetime.now().strftime("Documento generado %H:%M")
+    fecha_hora_parrafo = Paragraph(fecha_hora , left_aligned_style)
+    fecha_hora_parrafo.alignment = 1  # 2 = TA_RIGHT
+    story.append(fecha_hora_parrafo)
+    # Agrega un salto de línea
+    #story.append(Spacer(1, 12))
+    
+    # Agrega el título
+    title = Paragraph("<h3>Interworld</h3>", left_aligned_style)
+    story.append(title)
+
+    # Agrega un salto de línea
+    #story.append(Spacer(1, 12))
+
+    title2 = Paragraph("<h1>Reporte de citas realizadas</h1>", left_aligned_style)
+    story.append(title2)
+
+    
+    title3 = Paragraph("<h3>El Oro Machala</h3>", left_aligned_style)
+    story.append(title3)
+    story.append(Spacer(1, 12))
+    
+    # Prepara los datos para la tabla
+    data = [["tecnico", "cliente", "fecha", "comentario","estado"]]  # Encabezados
+
+    for dato in datos:
+        row = [dato['tecnico'], dato['cliente'], dato['fecha'], dato['comentario'],dato ['estado'] ]
+        data.append(row)
+
+    # Crea la tabla
+    table = Table(data, colWidths=[100, 100, 100, 100]) 
+
+    # Formatea la tabla
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.black),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 14),
+
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+        ('GRID', (0,0), (-1,-1), 1, colors.black)
+    ]))
+
+    # Agrega la tabla al documento
+    story.append(table)
+
+    doc.build(story)
+
+@app.route('/admin/reporte/re_vistacompleta', methods=['GET'])
+def re_vistacompleta():
+    doc = SimpleDocTemplate("reporte.pdf", pagesize=letter)
+    story = []
+
+    # Define un estilo con texto centrado
+    styles = getSampleStyleSheet()
+    left_aligned_style = styles['Heading3']
+    left_aligned_style.alignment = 0  # 1 = TA_CENTER
+
+    # Agrega la imagen
+    imagen = Image('static/img/inter.png', width=100, height=150)
+    imagen.hAlign = 'CENTER'
+    story.append(imagen)
+    story.append(Spacer(1, 12))
+
+    from datetime import datetime
+    fecha_hora = datetime.now().strftime("Documento generado %H:%M")
+    fecha_hora_parrafo = Paragraph(fecha_hora , left_aligned_style)
+    fecha_hora_parrafo.alignment = 1  # 2 = TA_RIGHT
+    story.append(fecha_hora_parrafo)
+    # Agrega un salto de línea
+    
+    
+    
+    # Agrega el título
+    title = Paragraph("<h3>Interworld</h3>", left_aligned_style)
+    story.append(title)
+
+    # Agrega un salto de línea
+    
+
+    title2 = Paragraph("<h1>Reporte por tecnicos</h1>", left_aligned_style)
+    #story.append(title2)
+
+    # Agrega otro salto de línea
+    
+
+    title3 = Paragraph("<h3>El Oro Machala</h3>", left_aligned_style)
+    story.append(title3)
+    story.append(Spacer(1, 12))
+
+    # Prepara los datos no como tabla
+    client = request.args.get('tecnico', default=None, type=str)
+    
+    
+    if client is not None:
+        clie = db['reporte'].find({'tecnico': client})
+    else:
+        clie = db['reporte'].find()
+    
+    generar_pdf_vistacompleta(clie)
+    
+    return send_file('reporte.pdf', as_attachment=True)
+
+
+
+
+
+
+
+
+
 #* Tecnico Recuperacion 
 @app.route('/tecnicos/vistarecu')
 def vistarecu():
@@ -398,7 +542,7 @@ def agenda():
                     tecnico_email = doc['correo']
             
                     # Envía la notificación por correo electrónico
-                    msg = Message('Nueva Agenda Registrada', sender='danniel_villacres@hotmail.com', recipients=[tecnico_email])
+                    msg = Message('Nueva Agenda Registrada', sender='popeye198733@hotmail.com', recipients=[tecnico_email])
                     msg.body = f'Se ha registrado una nueva agenda con los siguientes datos {telefono},{direccion},{canton} para el cliente {cliente}.'
                     mail.send(msg)
                     flash("Su cita se guardo exitosamente")
@@ -446,28 +590,35 @@ def vistencni2():
     if 'username' not in session:
         flash("Inicia sesion con tu usuario y contraseña")
         return redirect(url_for('index'))
-    if request.method == 'POST':
-        enviar=db["reporte"]
-        agendar=db["agendar"]
-        estador=db["estado"]
-        tecnico=request.form["tecnico"]
-        cliente=request.form["cliente"]
-        fecha=request.form["fecha"]
-        direccion=request.form["direccion"]
-        canton=request.form["canton"]
-        comentario=request.form["comentario"]
-        estado=request.form["estado"]
-        if tecnico and cliente and fecha and direccion and canton and comentario and estado:
-            enviare= Reporte(tecnico,cliente, fecha, direccion, canton, comentario, estado)
-            enviar.insert_one(enviare.RepoDBCollection())
-            # * Aquí eliminamos el documento de la colección "agendar"
-            agendar.delete_one({'cliente': cliente, 'fecha': fecha, 'direccion': direccion, 'canton': canton})
-            estador.delete_one({'cliente': cliente, 'fecha': fecha, 'direccion': direccion, 'canton': canton})
-            return redirect(url_for('vistecnicompleta'))
+    
+    if 'user' in session:
+        tecnico = db['estado'].find_one({'tecnico': session['user']})
+        if tecnico is None:
+            return render_template('tecni/vistenvi.html')
+        else:
+            if request.method == 'POST':
+                enviar=db["reporte"]
+                agendar=db["agendar"]
+                estador=db["estado"]
+                cliente=request.form["cliente"]
+                fecha=request.form["fecha"]
+                direccion=request.form["direccion"]
+                canton=request.form["canton"]
+                comentario=request.form["comentario"]
+                estado=request.form["estado"]
+                if cliente and fecha and direccion and canton and comentario and estado:
+                    enviare= Reporte(tecnico['tecnico'],cliente, fecha, direccion, canton, comentario, estado)
+                    enviar.insert_one(enviare.RepoDBCollection())
+                    # * Aquí eliminamos el documento de la colección "agendar"
+                    agendar.delete_one({'cliente': cliente, 'fecha': fecha, 'direccion': direccion, 'canton': canton})
+                    estador.delete_one({'cliente': cliente, 'fecha': fecha, 'direccion': direccion, 'canton': canton})
+                    return redirect(url_for('vistecnicompleta'))
+            else:
+                estado=db['estado'].find()
+                return render_template('tecni/vistenvi.html',estado=estado,user=session['user'],vistenviw2=tecnico)
     else:
-        estado=db['estado'].find()
-        return render_template('tecni/vistenvi.html',estado=estado)
-
+        return render_template('tecni/vistenvi.html')
+    
 
 #*Vista de los reportes que tiene es para visualizar todo lo que hay en ella
 @app.route('/tecni/vistacompleta')
@@ -476,8 +627,16 @@ def vistecnicompleta():
     if 'username' not in session:
         flash("Inicia sesion con tu usuario y contraseña")
         return redirect(url_for('index'))
-    reporte=db['reporte'].find()
-    return render_template('tecni/vistacompleta.html',reporte=reporte)
+    
+    if 'user' in session:
+        count = db['reporte'].count_documents({'tecnico': session['user']})
+        if count == 0:
+            return render_template('tecni/vistenvi.html')
+        else:
+            reporte = db['reporte'].find({'tecnico': session['user']})
+            return render_template('tecni/vistacompleta.html',reporte=reporte)
+    else:
+        return render_template('tecni/vistenvi.html')
 
 
 @app.route('/tecni/home',methods=['GET','POST'])

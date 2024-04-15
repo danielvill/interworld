@@ -18,6 +18,5 @@ class Agendar:
             "telefono":self.telefono,
             "direccion":self.direccion,
             "canton":self.canton,
-            "estado":self.estado,
-            
+            "estado":self.estado,   
         }
